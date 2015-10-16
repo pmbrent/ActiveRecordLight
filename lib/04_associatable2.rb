@@ -14,7 +14,9 @@ module Associatable
       source_table = source_options.model_class.table_name
       source_primary_key = "#{source_table}.#{source_options.primary_key}"
 
-      results = DBConnection.execute(<<-SQL)
+      through_foreign_key = self.send(through_options.foreign_key)
+
+      results = DBConnection.execute(<<-SQL, through_foreign_key)
         SELECT
           #{source_table}.*
         FROM
@@ -24,11 +26,11 @@ module Associatable
         ON
           #{source_options.foreign_key} = #{source_primary_key}
         WHERE
-          #{through_primary_key} = #{self.send(through_options.foreign_key)}
+          #{through_primary_key} = ?
       SQL
 
+      return nil if results.empty?
       source_options.model_class.new(results.first)
     end
-
   end
 end

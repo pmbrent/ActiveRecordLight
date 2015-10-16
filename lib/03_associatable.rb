@@ -29,7 +29,8 @@ end
 class HasManyOptions < AssocOptions
   def initialize(name, self_class_name, options = {})
     @class_name = options[:class_name] || name.to_s.singularize.camelcase
-    @foreign_key = options[:foreign_key] || "#{self_class_name.underscore}_id".to_sym
+    @foreign_key = options[:foreign_key] ||
+      "#{self_class_name.underscore}_id".to_sym
     @primary_key = options[:primary_key] || :id
   end
 end
@@ -42,19 +43,17 @@ module Associatable
     assoc_options[name] = bto
 
     define_method(name) do
-      match_val = self.send(bto.send(:foreign_key))
-      owner = bto.send(:model_class)
-              .where(bto.send(:primary_key) => match_val).first
+      match_val = self.send(bto.foreign_key)
+      bto.model_class.where(bto.primary_key => match_val).first
     end
   end
 
   def has_many(name, options = {})
-    hmo = HasManyOptions.new(name, self.to_s, options) # self is class
+    hmo = HasManyOptions.new(name, self.to_s, options)
 
     define_method(name) do
-      match_val = self.send(hmo.send(:primary_key)) # self will be instance
-      owned = hmo.send(:model_class)
-              .where(hmo.send(:foreign_key) => match_val)
+      match_val = self.send(hmo.primary_key)
+      hmo.model_class.where(hmo.foreign_key => match_val)
     end
   end
 

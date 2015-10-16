@@ -12,7 +12,7 @@ module Searchable
         #{where_line(params)}
     SQL
 
-    results.map { |row| self.new(row) }
+    self.parse_all(results)
   end
 
   def where_line(params)

@@ -25,7 +25,6 @@ class SQLObject
         attributes[column]
       end
     end
-
   end
 
   def self.table_name=(table_name)
@@ -33,20 +32,19 @@ class SQLObject
   end
 
   def self.table_name
-      self.table_name = self.to_s.tableize if !@table_name
-      @table_name
+    self.table_name = self.to_s.tableize if !@table_name
+    @table_name
   end
 
   def self.all
     records = DBConnection.execute(<<-SQL)
-    SELECT
-      *
-    FROM
-      #{table_name}
+      SELECT
+        *
+      FROM
+        #{table_name}
     SQL
 
     self.parse_all(records)
-
   end
 
   def self.parse_all(results)
