@@ -103,7 +103,7 @@ class SQLObject
   end
 
   def col_eqs
-    "( #{self.class.columns.map {|attr_name| "#{attr_name} = ?"} } )"
+    self.class.columns.map {|attr_name| "#{attr_name} = ?"}.join(",")
   end
 
   def question_marks(n)
@@ -124,6 +124,6 @@ class SQLObject
   end
 
   def save
-    # ...
+    id.nil? ? insert : update
   end
 end
