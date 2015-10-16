@@ -37,11 +37,23 @@ end
 module Associatable
   # Phase IIIb
   def belongs_to(name, options = {})
-    # ...
+    bto = BelongsToOptions.new(name, options)
+
+    define_method(name) do
+      match_val = self.send(bto.send(:foreign_key))
+      owner = bto.send(:model_class)
+              .where(bto.send(:primary_key) => match_val).first
+    end
   end
 
   def has_many(name, options = {})
-    # ...
+    hmo = HasManyOptions.new(name, self.to_s, options)
+
+    define_method(name) do
+      match_val = self.send(hmo.send(:primary_key))
+      owned = hmo.send(:model_class)
+              .where(hmo.send(:foreign_key) => match_val)
+    end
   end
 
   def assoc_options
@@ -50,5 +62,5 @@ module Associatable
 end
 
 class SQLObject
-  # Mixin Associatable here...
+  extend Associatable
 end
